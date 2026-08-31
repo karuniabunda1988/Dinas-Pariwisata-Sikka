@@ -80,6 +80,24 @@ $isiKepala = '
       <button class="btn btn-sm btn-link px-0 mt-2" type="button" id="peta-reset"><?= e(Lang::teks('reset')) ?></button>
     </div>
 
+    <!-- FR-MAP-11: unduh titik untuk GPS / aplikasi trekking & selam -->
+    <div class="p-3 border-bottom">
+      <h2 class="h6 text-uppercase text-secondary small mb-2">
+        <?= e(Lang::inggris() ? 'Download points' : 'Unduh Titik') ?>
+      </h2>
+      <p class="small text-body-secondary mb-2">
+        <?= e(Lang::inggris()
+              ? 'Save the destinations currently shown for use in a handheld GPS or trekking app - useful where there is no mobile signal.'
+              : 'Simpan destinasi yang sedang tampil untuk dipakai di GPS genggam atau aplikasi trekking - berguna di lokasi tanpa sinyal.') ?>
+      </p>
+      <div class="d-flex gap-2">
+        <a class="btn btn-sm btn-outline-secondary" id="unduh-gpx"
+           href="<?= e(url('/ekspor/gpx')) ?>" download>GPX</a>
+        <a class="btn btn-sm btn-outline-secondary" id="unduh-kml"
+           href="<?= e(url('/ekspor/kml')) ?>" download>KML</a>
+      </div>
+    </div>
+
     <!-- Hasil terlihat: juga berfungsi sebagai daftar teks (§10.7) -->
     <div class="peta-hasil p-3" id="peta-hasil" aria-live="polite"></div>
   </aside>
@@ -157,8 +175,12 @@ window.SIKKA_PETA = ' . json_skrip([
     'tile'     => $peta['tile_url'],
     'atribusi' => $peta['tile_atribusi'],
     'urlCari'  => url('/api/cari'),
+    'urlGpx'   => url('/ekspor/gpx'),
+    'urlKml'   => url('/ekspor/kml'),
     'urlPeta'  => url('/peta'),
     'terpilih' => $terpilih !== null ? $terpilih['slug'] : null,
+    'lapisan'  => $lapisan,
+    'urlBatas' => $urlBatas,
     'teks'     => [
         'lihatDetail'  => Lang::teks('lihat_detail'),
         'ruteKeSini'   => Lang::teks('rute_ke_sini'),
@@ -173,6 +195,9 @@ window.SIKKA_PETA = ' . json_skrip([
         'lokasiAnda'   => Lang::inggris() ? 'Your location' : 'Lokasi Anda',
         'tautanDisalin'=> Lang::inggris() ? 'Link copied.' : 'Tautan disalin.',
         'hasil'        => Lang::inggris() ? 'result(s)' : 'hasil',
+        'lapisanPeta'  => Lang::inggris() ? 'Map layer' : 'Lapisan peta',
+        'batasKec'     => Lang::inggris() ? 'District boundaries' : 'Batas Kecamatan',
+        'unduhTitik'   => Lang::inggris() ? 'Download points' : 'Unduh titik',
     ],
 ]) . ';
 </script>

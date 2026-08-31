@@ -83,6 +83,18 @@ Buka `C:\xampp\apache\conf\httpd.conf`, hilangkan tanda `#` pada baris
    **Pengaturan Situs** (nomor WhatsApp notifikasi, kontak dinas, tautan PPID
    dan OSS).
 
+### Tata letak document root
+
+Sistem mendukung dua tata letak dan mendeteksinya sendiri:
+
+| Tata letak | Kapan dipakai | Catatan |
+|---|---|---|
+| Document root = **akar proyek** | XAMPP `htdocs/nama-folder`, cPanel sederhana | `.htaccess` akar meneruskan ke `public/` dan memblokir `app/`, `database/`, `docs/` |
+| Document root = **folder `public/`** | cPanel bila kode ditaruh di luar `public_html` | **Lebih aman** - kode dan basis data sama sekali tidak berada di bawah web root |
+
+Tata letak kedua lebih disarankan bila hosting mengizinkan, karena
+perlindungan berkas tidak lagi bergantung pada `.htaccess`.
+
 ### Setelah go-live
 
 - Daftarkan `sitemap.xml` di Google Search Console.
@@ -167,12 +179,46 @@ dapat diaudit ketika dipakai sebagai bahan rapat anggaran.
 
 ## Aset Pihak Ketiga
 
-Bootstrap dan Leaflet dimuat dari CDN. Bila instansi menghendaki situs tetap
-berjalan tanpa akses CDN (mis. jaringan internal), unduh berkas Bootstrap dan
-Leaflet ke `public/assets/vendor/` lalu ganti URL-nya di
-`app/views/layouts/utama.php`, `app/views/layouts/admin.php`, dan view yang
-memuat peta. Halaman peta sudah menyediakan cadangan **daftar teks destinasi**
-yang tetap tampil bila peta gagal dimuat.
+Bootstrap 5.3.3, Leaflet 1.9.4, dan Leaflet.markercluster 1.5.3 **disertakan
+langsung** di `public/assets/vendor/` (total sekitar 556 KB), bukan dimuat
+dari CDN. Konsekuensinya:
+
+- Situs tetap tampil utuh ketika CDN tidak terjangkau - relevan untuk
+  konektivitas kecamatan pinggiran dan untuk demo XAMPP tanpa internet.
+- Tidak ada ketergantungan pihak ketiga pada aset milik pemerintah daerah.
+- Tidak perlu proses build; berkas cukup diunggah apa adanya.
+
+Yang masih memerlukan internet hanyalah **tile peta** (OpenStreetMap dkk.).
+Bila tile gagal dimuat, halaman peta otomatis menampilkan **daftar teks
+destinasi** sehingga wisatawan tetap memperoleh informasi inti (§10.7 PRD).
+
+### Lapisan peta (FR-MAP-10)
+
+Tersedia tiga lapisan dasar yang seluruhnya tanpa API key: **Peta Jalan**
+(OpenStreetMap), **Topografi** (OpenTopoMap - berguna untuk pendakian Gunung
+Egon), dan **Citra Satelit** (Esri World Imagery). Masing-masing dapat
+dimatikan lewat `app/config/config.php` tanpa mengubah kode.
+
+> Ketentuan pemakaian layanan citra satelit ditetapkan penyedianya dan dapat
+> berubah. Sebaiknya dipastikan Bagian Hukum/Diskominfo sebelum go-live, atau
+> diganti dengan langganan citra resmi/BIG. Mematikannya tidak memengaruhi
+> fitur lain.
+
+Lapisan **Batas Kecamatan** hanya muncul bila berkas GeoJSON resmi diletakkan
+di `public/data/` - lihat `public/data/README.md`. Data batas wilayah tidak
+disertakan karena harus berasal dari sumber sah (BIG/Ina-Geoportal atau Bagian
+Pemerintahan Setda), bukan digambar perkiraan.
+
+### Unduh titik GPS (FR-MAP-11)
+
+Halaman peta menyediakan tombol unduh **GPX** dan **KML** yang mengikuti
+filter yang sedang aktif. Berguna bagi pendaki Gunung Egon dan penyelam yang
+memerlukan koordinat di lokasi tanpa sinyal.
+
+| Endpoint | Keluaran |
+|---|---|
+| `GET /ekspor/gpx?kategori=&kecamatan=&q=` | GPX 1.1 untuk GPS genggam & aplikasi trekking |
+| `GET /ekspor/kml?kategori=&kecamatan=&q=` | KML untuk Google Earth / Maps |
 
 ---
 

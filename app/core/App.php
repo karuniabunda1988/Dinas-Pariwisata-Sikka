@@ -69,6 +69,10 @@ final class App
         ['GET',  '/api/cari',               'ApiController',       'cari'],
         ['GET',  '/api/umkm',               'ApiController',       'umkm'],
 
+        // --- Ekspor titik untuk GPS / aplikasi pihak ketiga (FR-MAP-11) --
+        ['GET',  '/ekspor/gpx',             'EksporController',    'gpx'],
+        ['GET',  '/ekspor/kml',             'EksporController',    'kml'],
+
         // --- SEO -------------------------------------------------------
         ['GET',  '/sitemap.xml',            'SeoController',       'sitemap'],
         ['GET',  '/robots.txt',             'SeoController',       'robots'],

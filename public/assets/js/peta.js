@@ -54,10 +54,7 @@
     });
     L.control.zoom({ position: 'topright' }).addTo(peta);
 
-    L.tileLayer(K.tile, {
-      maxZoom: K.zoomMaks || 18,
-      attribution: K.atribusi
-    }).addTo(peta);
+    pasangLapisanDasar();
 
     // FR-MAP-05: clustering - krusial karena Waigete saja punya 12 titik
     // berdekatan. Bila plugin gagal dimuat, mundur ke LayerGroup biasa.
@@ -124,6 +121,69 @@
         } catch (e) { /* diabaikan - percobaan berikutnya menangani */ }
       }
     }, 250);
+  }
+
+  /**
+   * FR-MAP-10: pilihan lapisan dasar (jalan / topografi / satelit) dan
+   * lapisan tambahan batas kecamatan.
+   *
+   * Bila hanya ada satu lapisan, kendali pemilih tidak ditampilkan supaya
+   * antarmuka tidak dipenuhi kontrol yang tak ada gunanya.
+   */
+  function pasangLapisanDasar() {
+    var daftar = (K.lapisan && K.lapisan.length) ? K.lapisan : [{
+      nama: 'Peta', url: K.tile, atribusi: K.atribusi,
+      zoomMaks: K.zoomMaks || 18, bawaan: true
+    }];
+
+    var dasar = {};
+    var pertama = null;
+
+    daftar.forEach(function (l) {
+      var lapis = L.tileLayer(l.url, {
+        maxZoom: l.zoomMaks || 18,
+        attribution: l.atribusi
+      });
+      dasar[l.nama] = lapis;
+      if (l.bawaan && !pertama) { pertama = lapis; }
+    });
+
+    if (!pertama) {
+      pertama = dasar[Object.keys(dasar)[0]];
+    }
+    pertama.addTo(peta);
+
+    // Lapisan batas kecamatan hanya ditawarkan bila berkas GeoJSON resmi
+    // memang tersedia di server - lihat public/data/README.md.
+    var tambahan = {};
+    if (K.urlBatas) {
+      var batas = L.geoJSON(null, {
+        style: { color: '#10312f', weight: 1.5, opacity: 0.7, fill: false, dashArray: '4 3' },
+        onEachFeature: function (fitur, lapis) {
+          var p = fitur.properties || {};
+          var nama = p.nama || p.NAMOBJ || p.WADMKC || p.name;
+          if (nama) { lapis.bindTooltip(String(nama), { sticky: true }); }
+        }
+      });
+
+      // Dimuat malas: hanya diunduh ketika pengguna benar-benar
+      // menyalakannya, agar tidak membebani koneksi lambat (§10.7).
+      var sudahDimuat = false;
+      peta.on('overlayadd', function (ev) {
+        if (ev.layer !== batas || sudahDimuat) { return; }
+        sudahDimuat = true;
+        fetch(K.urlBatas)
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (g) { if (g) { batas.addData(g); } })
+          .catch(function () { sudahDimuat = false; });
+      });
+
+      tambahan[K.teks.batasKec] = batas;
+    }
+
+    if (Object.keys(dasar).length > 1 || Object.keys(tambahan).length > 0) {
+      L.control.layers(dasar, tambahan, { position: 'topright', collapsed: true }).addTo(peta);
+    }
   }
 
   function gagalMuatPeta() {
@@ -241,6 +301,24 @@
     perbaruiHasil(terlihat);
     var jml = document.getElementById('peta-jumlah');
     if (jml) { jml.textContent = String(terlihat.length); }
+    perbaruiTautanUnduh();
+  }
+
+  /**
+   * FR-MAP-11: tautan unduh mengikuti filter yang sedang aktif, sehingga
+   * yang terunduh persis sama dengan yang sedang terlihat di peta.
+   */
+  function perbaruiTautanUnduh() {
+    var q = [];
+    if (filter.kategori)  { q.push('kategori=' + encodeURIComponent(filter.kategori)); }
+    if (filter.kecamatan) { q.push('kecamatan=' + encodeURIComponent(filter.kecamatan)); }
+    if (filter.cari)      { q.push('q=' + encodeURIComponent(filter.cari)); }
+    var qs = q.length ? '?' + q.join('&') : '';
+
+    var gpx = document.getElementById('unduh-gpx');
+    var kml = document.getElementById('unduh-kml');
+    if (gpx && K.urlGpx) { gpx.href = K.urlGpx + qs; }
+    if (kml && K.urlKml) { kml.href = K.urlKml + qs; }
   }
 
   function gantiUrlPin(slug) {

@@ -40,6 +40,67 @@ $config = [
         'lng_awal'     => 122.2111,
         'zoom_awal'    => 10,
         'zoom_maks'    => 18,
+
+        /*
+         * Lapisan peta tambahan (FR-MAP-10, Fase 2).
+         *
+         * Seluruhnya tanpa API key dan tanpa akun berbayar, sejalan dengan
+         * keputusan §10.1. Set 'aktif' => false untuk mematikan salah satu
+         * lapisan tanpa mengubah kode.
+         *
+         * CATATAN LISENSI - PERIKSA SEBELUM GO-LIVE:
+         * Lapisan citra satelit di bawah memakai layanan Esri yang lazim
+         * dipakai bebas dengan atribusi, tetapi ketentuannya ditetapkan
+         * penyedia dan dapat berubah. Bagian Hukum/Diskominfo sebaiknya
+         * memastikan kesesuaiannya untuk situs instansi pemerintah, atau
+         * menggantinya dengan langganan citra resmi/BIG bila diperlukan.
+         * Mematikannya ('aktif' => false) tidak memengaruhi fitur lain.
+         */
+        'lapisan' => [
+            [
+                'nama'     => 'Peta Jalan',
+                'nama_en'  => 'Street Map',
+                'url'      => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'atribusi' => '&copy; Kontributor <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                'zoom_maks'=> 19,
+                'aktif'    => true,
+                'bawaan'   => true,
+            ],
+            [
+                // Berguna untuk pendaki Gunung Egon: menampilkan garis kontur.
+                'nama'     => 'Topografi',
+                'nama_en'  => 'Topographic',
+                'url'      => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+                'atribusi' => 'Peta: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA), data &copy; Kontributor OpenStreetMap',
+                'zoom_maks'=> 17,
+                'aktif'    => true,
+                'bawaan'   => false,
+            ],
+            [
+                'nama'     => 'Citra Satelit',
+                'nama_en'  => 'Satellite',
+                'url'      => 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                'atribusi' => 'Citra &copy; Esri, Maxar, Earthstar Geographics',
+                'zoom_maks'=> 18,
+                'aktif'    => true,
+                'bawaan'   => false,
+            ],
+        ],
+
+        /*
+         * Lapisan batas kecamatan (FR-MAP-10).
+         *
+         * Berkas GeoJSON TIDAK disertakan karena data batas wilayah resmi
+         * harus berasal dari sumber sah - Badan Informasi Geospasial
+         * (Ina-Geoportal) atau Bagian Pemerintahan Setda. Menggambar batas
+         * kecamatan berdasarkan perkiraan akan menyesatkan dan berpotensi
+         * menimbulkan persoalan administratif.
+         *
+         * Cara mengaktifkan: taruh berkas GeoJSON di public/data/ dengan nama
+         * di bawah. Kendali lapisan akan memunculkan opsinya secara otomatis
+         * hanya bila berkas itu ada.
+         */
+        'batas_kecamatan' => 'data/batas-kecamatan.geojson',
     ],
 
     // --- Unggah berkas -------------------------------------------------
