@@ -17,6 +17,33 @@
   --sikka-gelap:     #10312f;
   --sikka-lembut:    #f1f7f6;
   --radius:          .65rem;
+
+  /* --- Penyesuaian kontras WCAG 2.1 AA -------------------------------
+     Nilai bawaan Bootstrap gagal memenuhi 4.5:1 di atas latar terang yang
+     dipakai situs ini (#f8f9fa dan #f1f7f6):
+       tautan  #0d6efd -> 4.15:1   teks sekunder #6c757d -> 4.33:1
+     Nilai di bawah sudah dihitung ulang dan lolos di ketiga latar
+     (putih, #f8f9fa, #f1f7f6). Lihat docs/audit-aksesibilitas.md. */
+  --bs-link-color:            #0a58ca;
+  --bs-link-color-rgb:        10, 88, 202;
+  --bs-link-hover-color:      #084298;
+  --bs-link-hover-color-rgb:  8, 66, 152;
+  --bs-secondary-color:       #5c636a;
+  --bs-secondary-color-rgb:   92, 99, 106;
+}
+
+/* Bootstrap memakai dua token berbeda:
+     .text-secondary       -> --bs-secondary-rgb        (warna tema #6c757d)
+     .text-body-secondary  -> --bs-secondary-color
+   Keduanya digelapkan HANYA untuk teks; --bs-secondary-rgb tidak diubah
+   secara global agar .bg-secondary dan .btn-secondary tetap seperti semula. */
+.text-secondary {
+  --bs-secondary-rgb: 92, 99, 106;
+  --bs-text-opacity: 1;
+}
+.text-body-secondary {
+  --bs-secondary-color: #5c636a;
+  --bs-text-opacity: 1;
 }
 
 body {
@@ -155,18 +182,23 @@ textarea:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: .25rem;
-  font-size: .72rem;
+  font-size: .78rem;          /* dinaikkan dari .72rem demi keterbacaan */
   font-weight: 600;
   padding: .15rem .5rem;
   border-radius: 999px;
-  color: var(--warna, var(--sikka-teal));
+  /* Warna kategori murni terlalu terang di atas latar chip-nya sendiri
+     (emas hanya 2.61:1). Digelapkan 27% sehingga seluruh kategori lolos
+     >= 4.5:1 tanpa kehilangan identitas warnanya. */
+  color: color-mix(in srgb, var(--warna, #0d7d74) 73%, black);
   background: color-mix(in srgb, var(--warna, #0d7d74) 12%, white);
   border: 1px solid color-mix(in srgb, var(--warna, #0d7d74) 35%, white);
 }
 
-/* Fallback untuk peramban lama tanpa color-mix. */
+/* Fallback untuk peramban lama tanpa color-mix: pakai netral gelap yang
+   pasti kontras, identitas kategori tetap terbaca lewat titik warnanya. */
 @supports not (color: color-mix(in srgb, red 10%, white)) {
   .chip-kategori {
+    color: #1c2422;
     background: #f3f4f6;
     border-color: #d1d5db;
   }
@@ -276,6 +308,7 @@ textarea:focus-visible,
 .chip-filter.aktif {
   border-color: var(--warna, var(--sikka-teal));
   background: color-mix(in srgb, var(--warna, #0d7d74) 12%, white);
+  color: #1c2422;
   font-weight: 600;
 }
 @supports not (color: color-mix(in srgb, red 10%, white)) {

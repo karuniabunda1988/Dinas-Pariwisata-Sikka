@@ -4,7 +4,7 @@
  * Staf Dinas tidak pernah diminta mengetik lintang/bujur.
  */
 $peta = App::config('peta');
-$isiKepala = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">';
+$isiKepala = '<link rel="stylesheet" href="' . e(aset('assets/vendor/leaflet/leaflet.css')) . '">';
 
 $nilai = static function (string $kunci, $bawaan = '') use ($d) {
     $lama = Session::inputLama($kunci, null);
@@ -410,7 +410,7 @@ $adaKoordinat = ($d['latitude'] ?? null) !== null;
 
 <?php
 $isiSkrip = '
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="' . e(aset('assets/vendor/leaflet/leaflet.js')) . '" defer></script>
 <script>
 window.SIKKA_ADMIN_PETA = ' . json_skrip([
     'lat'      => (float) Pengaturan::ambil('peta_lat_awal', (string) $peta['lat_awal']),

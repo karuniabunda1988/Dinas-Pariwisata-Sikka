@@ -5,9 +5,9 @@
  */
 $peta = App::config('peta');
 $isiKepala = '
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">';
+<link rel="stylesheet" href="' . e(aset('assets/vendor/leaflet/leaflet.css')) . '">
+<link rel="stylesheet" href="' . e(aset('assets/vendor/markercluster/MarkerCluster.css')) . '">
+<link rel="stylesheet" href="' . e(aset('assets/vendor/markercluster/MarkerCluster.Default.css')) . '">';
 ?>
 
 <div class="peta-halaman">
@@ -145,8 +145,8 @@ $isiKepala = '
 
 <?php
 $isiSkrip = '
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer></script>
+<script src="' . e(aset('assets/vendor/leaflet/leaflet.js')) . '" defer></script>
+<script src="' . e(aset('assets/vendor/markercluster/leaflet.markercluster.js')) . '" defer></script>
 <script>
 window.SIKKA_PETA = ' . json_skrip([
     'pin'      => $pin,

@@ -13,6 +13,22 @@ final class App
     private static string $uri = '';
 
     /**
+     * Awalan menuju folder public/ dari sudut pandang peramban.
+     *
+     * Dua tata letak sama-sama didukung:
+     *  - Document root = akar proyek (XAMPP htdocs/nama-folder). Permintaan
+     *    diteruskan .htaccess ke public/index.php, sehingga aset berada di
+     *    "<base>/public/assets/...". Nilai ini menjadi '/public'.
+     *  - Document root = folder public/ (lazim pada cPanel bila kode ditaruh
+     *    di luar public_html). Aset berada di "<base>/assets/...", sehingga
+     *    nilai ini kosong.
+     *
+     * Menyamaratakan keduanya membuat seluruh CSS/JS gagal dimuat pada salah
+     * satu tata letak - situs tetap terbuka tetapi tampil tanpa gaya.
+     */
+    private static string $awalanPublic = '';
+
+    /**
      * Tabel rute: [metode, pola, controller, aksi].
      * Pola memakai penanda {slug} / {id} yang diterjemahkan ke regex.
      * @var array<int,array{0:string,1:string,2:string,3:string}>
@@ -167,14 +183,23 @@ final class App
         $manual = trim((string) self::$config['app']['base_url']);
         if ($manual !== '') {
             self::$basePath = rtrim($manual, '/');
+            $skrip = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+            if (str_contains(dirname($skrip), '/public')) {
+                self::$awalanPublic = '/public';
+            }
         } else {
             $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
             $dir    = rtrim(dirname($script), '/');
-            // Front controller ada di /public - hilangkan dari base path
+
+            // Front controller dijalankan dari dalam /public: berarti document
+            // root berada satu tingkat di atasnya, dan aset harus dirujuk
+            // dengan awalan /public.
             if (str_ends_with($dir, '/public')) {
                 $dir = substr($dir, 0, -strlen('/public'));
+                self::$awalanPublic = '/public';
             } elseif ($dir === '/public') {
                 $dir = '';
+                self::$awalanPublic = '/public';
             }
             self::$basePath = $dir === '/' ? '' : $dir;
         }
@@ -315,6 +340,12 @@ final class App
     public static function basePath(): string
     {
         return self::$basePath;
+    }
+
+    /** Awalan URL menuju folder public/ ('' atau '/public'). Lihat $awalanPublic. */
+    public static function awalanPublic(): string
+    {
+        return self::$awalanPublic;
     }
 
     public static function uri(): string

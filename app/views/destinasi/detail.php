@@ -9,7 +9,7 @@ $adaKoordinat = $d['latitude'] !== null && $d['longitude'] !== null;
 $fasilitas = array_values(array_filter(array_map('trim', explode(',', (string) $d['fasilitas']))));
 
 if ($adaKoordinat) {
-    $isiKepala = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">';
+    $isiKepala = '<link rel="stylesheet" href="' . e(aset('assets/vendor/leaflet/leaflet.css')) . '">';
 }
 ?>
 
@@ -323,7 +323,7 @@ if ($adaKoordinat) {
 if ($adaKoordinat) {
     // Peta mini terpusat pada lokasi destinasi (FR-DEST-02).
     $isiSkrip = '
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="' . e(aset('assets/vendor/leaflet/leaflet.js')) . '" defer></script>
 <script>
 window.addEventListener("load", function () {
   var el = document.getElementById("peta-mini");

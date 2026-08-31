@@ -23,17 +23,21 @@
   var wadah = document.getElementById('peta-utama');
   if (!wadah) { return; }
 
-  // Leaflet dimuat dengan defer - tunggu sampai benar-benar siap.
-  if (typeof L === 'undefined') {
-    window.addEventListener('load', mulai);
-  } else {
-    mulai();
-  }
-
+  // Keadaan modul HARUS disiapkan sebelum mulai() dipanggil. Ketika Leaflet
+  // dimuat dari berkas lokal, skrip ini berjalan setelah Leaflet siap
+  // sehingga mulai() dijalankan langsung - bila deklarasi di bawahnya,
+  // semuaPin masih undefined dan peta gagal menggambar pin.
   var peta, lapisanPin, penandaLokasi = null;
   var semuaPin = K.pin || [];
   var penandaPerSlug = {};
   var filter = { kategori: '', kecamatan: '', cari: '' };
+
+  if (typeof L === 'undefined') {
+    // Leaflet belum siap (mis. dimuat dari CDN atau koneksi lambat).
+    window.addEventListener('load', mulai);
+  } else {
+    mulai();
+  }
 
   function mulai() {
     if (typeof L === 'undefined') {
@@ -74,19 +78,52 @@
     gambarPin();
     pasangKendali();
 
-    // FR-MAP-09: buka popup otomatis bila URL memuat ?destinasi=slug
+    // FR-MAP-09: buka popup otomatis bila URL memuat ?destinasi=slug.
+    // Tunggu peta selesai bergerak lebih dulu - membuka popup saat peta masih
+    // beranimasi membuat popup tidak jadi muncul.
     if (K.terpilih && penandaPerSlug[K.terpilih]) {
-      var p = penandaPerSlug[K.terpilih];
-      peta.setView(p.getLatLng(), 14);
-      // Beri jeda agar cluster sempat memecah diri sebelum popup dibuka.
-      window.setTimeout(function () {
-        if (lapisanPin.zoomToShowLayer) {
-          lapisanPin.zoomToShowLayer(p, function () { p.openPopup(); });
-        } else {
-          p.openPopup();
-        }
-      }, 300);
+      var penandaAwal = penandaPerSlug[K.terpilih];
+      // Zoom 16 melewati disableClusteringAtZoom (15) sehingga pin yang
+      // dituju pasti tidak tergabung dalam cluster.
+      peta.once('moveend', function () { bukaPopupAman(penandaAwal); });
+      peta.setView(penandaAwal.getLatLng(), 16);
     }
+  }
+
+  /**
+   * Membuka popup sebuah penanda dengan aman.
+   *
+   * zoomToShowLayer() memecah cluster lebih dulu, tetapi callback-nya hanya
+   * terpanggil bila peta benar-benar bergerak. Ketika penanda sudah terlihat
+   * (tidak dalam cluster), callback itu tidak pernah jalan dan popup tidak
+   * terbuka - persis kasus tautan berbagi /peta?destinasi=slug. Karena itu
+   * selalu ada jaring pengaman yang membuka popup secara langsung.
+   */
+  function bukaPopupAman(penanda) {
+    if (!penanda) { return; }
+
+    var sisa = 10;
+    var timer = window.setInterval(function () {
+      if (penanda.isPopupOpen && penanda.isPopupOpen()) {
+        window.clearInterval(timer);
+        return;
+      }
+      if (sisa-- <= 0) {
+        window.clearInterval(timer);
+        return;
+      }
+
+      // Penanda yang sedang tergabung dalam cluster tidak punya _icon dan
+      // tidak terpasang di peta, sehingga openPopup() tidak berefek apa pun.
+      // Pecah dulu cluster-nya, baru buka popup.
+      if (penanda._icon) {
+        penanda.openPopup();
+      } else if (lapisanPin.zoomToShowLayer) {
+        try {
+          lapisanPin.zoomToShowLayer(penanda, function () { penanda.openPopup(); });
+        } catch (e) { /* diabaikan - percobaan berikutnya menangani */ }
+      }
+    }, 250);
   }
 
   function gagalMuatPeta() {
@@ -237,11 +274,7 @@
     var penanda = penandaPerSlug[slug];
     if (!penanda) { return; }
     peta.setView(penanda.getLatLng(), Math.max(peta.getZoom(), 14));
-    if (lapisanPin.zoomToShowLayer) {
-      lapisanPin.zoomToShowLayer(penanda, function () { penanda.openPopup(); });
-    } else {
-      penanda.openPopup();
-    }
+    bukaPopupAman(penanda);
   }
 
   function pasangKendali() {

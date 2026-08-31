@@ -10,7 +10,7 @@ $peran = Auth::peran();
 <title><?= e($meta['judul'] ?? 'Panel Admin') ?> | Admin Pariwisata Sikka</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="<?= e(aset('assets/img/favicon.svg')) ?>" type="image/svg+xml">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<link rel="stylesheet" href="<?= e(aset('assets/vendor/bootstrap/bootstrap.min.css')) ?>">
 <link rel="stylesheet" href="<?= e(aset('assets/css/gaya.css')) ?>">
 <?= $isiKepala ?? '' ?>
 </head>
@@ -120,7 +120,7 @@ $peran = Auth::peran();
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous" defer></script>
+<script src="<?= e(aset('assets/vendor/bootstrap/bootstrap.bundle.min.js')) ?>" defer></script>
 <script src="<?= e(aset('assets/js/admin.js')) ?>" defer></script>
 <?= $isiSkrip ?? '' ?>
 </body>

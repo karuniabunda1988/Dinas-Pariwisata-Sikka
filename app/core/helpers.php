@@ -18,10 +18,16 @@ function url(string $path = '/', array $query = []): string
     return $url === '' ? '/' : $url;
 }
 
-/** URL berkas aset statis di folder public/. */
+/**
+ * URL berkas aset statis di folder public/.
+ *
+ * Awalan '/public' hanya ditambahkan bila document root memang berada di
+ * atas folder public/ - lihat App::awalanPublic(). Menyamaratakannya membuat
+ * seluruh CSS/JS 404 pada salah satu tata letak hosting.
+ */
 function aset(string $path): string
 {
-    return App::basePath() . '/public/' . ltrim($path, '/');
+    return App::basePath() . App::awalanPublic() . '/' . ltrim($path, '/');
 }
 
 /** URL berkas unggahan; mengembalikan placeholder bila kosong. */

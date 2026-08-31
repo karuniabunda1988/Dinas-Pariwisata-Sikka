@@ -36,6 +36,12 @@
       return;
     }
 
+    // Buang skeleton loading sebelum peta dipasang. Bila dibiarkan, elemen
+    // ini tetap menutupi peta dan menelan seluruh klik - admin melihat peta
+    // tetapi tidak bisa memilih titik sama sekali.
+    var skeleton = wadah.querySelector('.peta-skeleton');
+    if (skeleton) { skeleton.remove(); }
+
     var adaTitik = inLat.value !== '' && inLng.value !== '';
     var lat = adaTitik ? parseFloat(inLat.value) : K.lat;
     var lng = adaTitik ? parseFloat(inLng.value) : K.lng;

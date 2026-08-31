@@ -4,7 +4,7 @@
  * statis - pengguna bisa langsung menggeser dan mengklik pin.
  */
 $peta = App::config('peta');
-$isiKepala = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">';
+$isiKepala = '<link rel="stylesheet" href="' . e(aset('assets/vendor/leaflet/leaflet.css')) . '">';
 ?>
 
 <section class="hero-beranda">
@@ -189,7 +189,7 @@ $isiKepala = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/
 <?php
 // Skrip peta ringkas beranda. Leaflet dimuat defer agar tidak memblokir render.
 $isiSkrip = '
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="' . e(aset('assets/vendor/leaflet/leaflet.js')) . '" defer></script>
 <script>
 window.SIKKA_PETA = ' . json_skrip([
     'pin'     => $pinAwal,
