@@ -1,0 +1,42 @@
+# =====================================================================
+# Root .htaccess - meneruskan seluruh permintaan ke folder public/
+# Cocok untuk XAMPP (htdocs/nama-folder) maupun cPanel document root.
+# =====================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Jangan pernah menyajikan berkas sensitif secara langsung.
+    RewriteRule ^(app|database|docs)/ - [F,L]
+    RewriteRule (^|/)\.(git|env) - [F,L]
+
+    # Sudah menunjuk ke public/ - biarkan .htaccess public yang menangani.
+    RewriteCond %{REQUEST_URI} ^/?public/ [OR]
+    RewriteCond %{REQUEST_URI} (^|/)public/
+    RewriteRule ^ - [L]
+
+    # Berkas/direktori nyata di dalam public/ disajikan apa adanya.
+    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
+    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+
+    # Aset statis: petakan ke dalam public/ bila ada.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ public/index.php [L,QSA]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    DirectoryIndex index.php
+</IfModule>
+
+# Blokir akses langsung ke kode sumber & data.
+<FilesMatch "\.(sql|md|json|lock|log)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

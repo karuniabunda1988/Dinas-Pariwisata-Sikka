@@ -1,0 +1,42 @@
+# =====================================================================
+# public/.htaccess - front controller & header keamanan dasar
+# =====================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Berkas atau direktori nyata (aset, unggahan) disajikan apa adanya.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Sisanya masuk ke front controller.
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+# --- Header keamanan (§12) -------------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # HSTS hanya diaktifkan setelah HTTPS terpasang di produksi:
+    # Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
+
+# --- Cache aset statis -----------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css            "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/jpeg          "access plus 30 days"
+    ExpiresByType image/png           "access plus 30 days"
+    ExpiresByType image/webp          "access plus 30 days"
+    ExpiresByType image/svg+xml       "access plus 30 days"
+</IfModule>
+
+# --- Kompresi: penting untuk koneksi 3G di kecamatan pinggiran (§12) --
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+    AddOutputFilterByType DEFLATE application/javascript application/json
+</IfModule>

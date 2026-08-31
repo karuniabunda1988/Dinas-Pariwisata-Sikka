@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260" role="img" aria-label="Foto destinasi belum tersedia">
+  <rect width="400" height="260" fill="#e4ebea"/>
+  <path d="M0 190l70-55 55 40 75-70 90 68 110-80v107H0z" fill="#c7d6d3"/>
+  <circle cx="315" cy="62" r="26" fill="#d8e3e1"/>
+  <text x="200" y="238" font-family="system-ui, sans-serif" font-size="15" fill="#6b7f7b" text-anchor="middle">Foto belum tersedia</text>
+</svg>

@@ -1,0 +1,17 @@
+# Kredensial produksi - JANGAN pernah di-commit
+/app/config/config.local.php
+
+# Berkas unggahan pengguna (foto destinasi/UMKM/event/artikel)
+/public/uploads/*/*
+!/public/uploads/*/.gitkeep
+
+# Log & berkas sementara
+*.log
+/tmp/
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp

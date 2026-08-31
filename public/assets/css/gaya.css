@@ -1,0 +1,460 @@
+/* =====================================================================
+   Sistem Informasi & Peta Interaktif Pariwisata Kabupaten Sikka
+   Berkas gaya utama - melengkapi Bootstrap 5.
+   (c) Karunia Bunda IT Training Center Maumere
+
+   Warna kategori mengikuti §10.5 PRD dan konsisten di seluruh situs:
+   pin peta, chip kategori, dan kartu memakai nilai yang sama sehingga
+   wisatawan mengenali kategori sekilas tanpa membaca legenda berulang.
+   ===================================================================== */
+
+:root {
+  --sikka-teal:      #0d7d74;   /* Bahari / Pantai   */
+  --sikka-teal-tua:  #095c56;
+  --sikka-lumut:     #4d7c0f;   /* Alam & Trekking   */
+  --sikka-emas:      #ca8a04;   /* Budaya & Religi   */
+  --sikka-terakota:  #c2410c;   /* Buatan            */
+  --sikka-gelap:     #10312f;
+  --sikka-lembut:    #f1f7f6;
+  --radius:          .65rem;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #1c2422;
+}
+
+/* --- Aksesibilitas (FR-A11Y-01 / WCAG 2.1 AA) ----------------------- */
+
+/* Tautan lewati navigasi untuk pengguna keyboard & pembaca layar. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2000;
+  background: var(--sikka-gelap);
+  color: #fff;
+  padding: .75rem 1rem;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+/* Fokus selalu terlihat jelas - jangan pernah dimatikan. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.chip-filter:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+/* Target sentuh minimal 44px untuk kendali utama di ponsel. */
+.btn, .nav-link, .chip-filter, .hasil-tombol, .saran-item {
+  min-height: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* --- Identitas & navigasi ------------------------------------------- */
+
+.bg-brand      { background-color: var(--sikka-gelap); }
+.bg-brand-soft { background-color: var(--sikka-lembut); }
+.text-teal     { color: var(--sikka-teal-tua); }
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--sikka-teal);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: .5px;
+  flex-shrink: 0;
+}
+
+.navbar-brand strong { font-size: 1rem; }
+
+.btn-teal {
+  background: var(--sikka-teal);
+  border-color: var(--sikka-teal);
+  color: #fff;
+}
+.btn-teal:hover,
+.btn-teal:focus {
+  background: var(--sikka-teal-tua);
+  border-color: var(--sikka-teal-tua);
+  color: #fff;
+}
+.btn-outline-teal {
+  border-color: var(--sikka-teal);
+  color: var(--sikka-teal-tua);
+}
+.btn-outline-teal:hover,
+.btn-outline-teal:focus {
+  background: var(--sikka-teal);
+  color: #fff;
+}
+
+/* --- Beranda -------------------------------------------------------- */
+
+.hero-beranda {
+  background: linear-gradient(180deg, var(--sikka-lembut) 0%, #ffffff 100%);
+}
+
+.angka-ringkas {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--sikka-teal-tua);
+  line-height: 1.1;
+}
+
+.strip-event {
+  background: #fffbeb;
+  border-top: 1px solid #fde68a;
+  border-bottom: 1px solid #fde68a;
+}
+.strip-teks {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+}
+
+.kartu-kategori {
+  display: block;
+  padding: 1rem .75rem;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-top: 4px solid var(--warna, var(--sikka-teal));
+  text-align: center;
+  height: 100%;
+  color: #1c2422;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.kartu-kategori:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08);
+}
+.kartu-kategori .ikon  { display: block; font-size: 1.5rem; }
+.kartu-kategori .nama  { display: block; font-size: .85rem; font-weight: 600; margin-top: .25rem; }
+.kartu-kategori .jumlah{ display: block; font-size: .75rem; color: #6b7280; }
+
+/* --- Chip & penanda kategori (konsisten dengan warna pin) ------------ */
+
+.chip-kategori {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .15rem .5rem;
+  border-radius: 999px;
+  color: var(--warna, var(--sikka-teal));
+  background: color-mix(in srgb, var(--warna, #0d7d74) 12%, white);
+  border: 1px solid color-mix(in srgb, var(--warna, #0d7d74) 35%, white);
+}
+
+/* Fallback untuk peramban lama tanpa color-mix. */
+@supports not (color: color-mix(in srgb, red 10%, white)) {
+  .chip-kategori {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+}
+
+.titik-kategori {
+  display: inline-block;
+  width: .6rem;
+  height: .6rem;
+  border-radius: 50%;
+  margin-right: .3rem;
+  flex-shrink: 0;
+}
+
+/* --- Kartu destinasi ------------------------------------------------ */
+
+.kartu-destinasi {
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow .15s ease;
+}
+.kartu-destinasi:hover { box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08); }
+
+.rasio-foto {
+  aspect-ratio: 16 / 10;
+  background: #e9eef0;
+  overflow: hidden;
+}
+.rasio-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- Halaman peta (fitur inti) -------------------------------------- */
+
+.peta-halaman {
+  display: flex;
+  min-height: calc(100vh - 64px);
+  align-items: stretch;
+}
+
+.peta-panel {
+  width: 340px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  overflow-y: auto;
+  max-height: calc(100vh - 64px);
+}
+
+.peta-wadah { position: relative; flex: 1 1 auto; }
+
+.peta-utama {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  background: #dfe7e6;
+}
+
+.peta-ringkas-bungkus {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+.peta-ringkas {
+  height: 380px;
+  background: #dfe7e6;
+}
+
+/* Skeleton saat peta belum siap (§10.7) - memberi umpan balik pada
+   koneksi lambat alih-alih kotak kosong. */
+.peta-skeleton {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(100deg, #e4ebea 30%, #f2f6f5 50%, #e4ebea 70%);
+  background-size: 200% 100%;
+  animation: geser 1.4s ease-in-out infinite;
+}
+@keyframes geser {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.peta-toggle-panel {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 500;
+}
+
+.chip-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .78rem;
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.chip-filter.aktif {
+  border-color: var(--warna, var(--sikka-teal));
+  background: color-mix(in srgb, var(--warna, #0d7d74) 12%, white);
+  font-weight: 600;
+}
+@supports not (color: color-mix(in srgb, red 10%, white)) {
+  .chip-filter.aktif { background: #eef4f3; }
+}
+
+/* Autocomplete pencarian peta */
+.saran-daftar {
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 0 0 var(--radius) var(--radius);
+  max-height: 280px;
+  overflow-y: auto;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+  margin: 0;
+}
+.saran-item, .hasil-tombol {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #f3f4f6;
+  padding: .5rem .75rem;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.saran-item:hover, .hasil-tombol:hover { background: var(--sikka-lembut); }
+
+.peta-hasil { max-height: none; }
+.hasil-item { border-radius: .4rem; overflow: hidden; }
+.hasil-nama { font-weight: 600; }
+
+/* Popup pin peta (FR-MAP-02) */
+.popup-destinasi { min-width: 220px; }
+.popup-foto {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: .4rem;
+  margin-bottom: .5rem;
+  display: block;
+}
+.popup-judul  { font-size: 1rem; font-weight: 700; margin: .35rem 0 .25rem; }
+.popup-meta   { font-size: .78rem; color: #4b5563; margin: 0 0 .2rem; }
+.popup-ringkas{ font-size: .8rem; margin: .25rem 0 .5rem; }
+.popup-aksi   { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
+.popup-aksi .btn { min-height: 34px; font-size: .78rem; }
+
+@media (max-width: 991.98px) {
+  .peta-halaman { flex-direction: column; min-height: auto; }
+  .peta-panel {
+    width: 100%;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid #e5e7eb;
+    display: none;
+  }
+  .peta-halaman.panel-terbuka .peta-panel { display: block; }
+  .peta-utama { height: 65vh; min-height: 360px; }
+}
+
+/* --- Halaman detail destinasi --------------------------------------- */
+
+.galeri-destinasi img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.peta-mini {
+  height: 280px;
+  border-radius: var(--radius);
+  background: #dfe7e6;
+}
+
+.daftar-fakta dt { font-size: .75rem; text-transform: uppercase; color: #6b7280; font-weight: 600; }
+.daftar-fakta dd { margin-bottom: .75rem; }
+
+.catatan-verifikasi {
+  border-left: 4px solid #f59e0b;
+  background: #fffbeb;
+  padding: .75rem 1rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: .85rem;
+}
+
+/* --- Panel admin ---------------------------------------------------- */
+
+.admin-tata {
+  display: flex;
+  min-height: 100vh;
+  align-items: stretch;
+}
+.admin-samping {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--sikka-gelap);
+  color: #cbd5d3;
+  padding: 1rem 0;
+}
+.admin-samping a {
+  display: block;
+  padding: .55rem 1.25rem;
+  color: #cbd5d3;
+  text-decoration: none;
+  font-size: .9rem;
+  border-left: 3px solid transparent;
+}
+.admin-samping a:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+.admin-samping a.aktif {
+  background: rgba(255, 255, 255, .1);
+  border-left-color: var(--sikka-teal);
+  color: #fff;
+  font-weight: 600;
+}
+.admin-samping .kelompok {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #7d938f;
+  padding: 1rem 1.25rem .35rem;
+}
+.admin-isi { flex: 1 1 auto; background: #f6f8f8; min-width: 0; }
+
+.kartu-angka {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius);
+  padding: 1rem;
+  height: 100%;
+}
+.kartu-angka .nilai { font-size: 1.75rem; font-weight: 700; line-height: 1.1; }
+.kartu-angka .label { font-size: .78rem; color: #6b7280; }
+
+.peta-pemilih {
+  height: 360px;
+  border-radius: var(--radius);
+  border: 1px solid #d1d5db;
+  background: #dfe7e6;
+}
+
+.pratinjau-foto {
+  width: 90px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: .35rem;
+  margin: .25rem .25rem 0 0;
+  border: 1px solid #d1d5db;
+}
+
+@media (max-width: 991.98px) {
+  .admin-tata { flex-direction: column; }
+  .admin-samping { width: 100%; }
+  .admin-samping .menu-gulir { display: flex; overflow-x: auto; }
+  .admin-samping .kelompok { display: none; }
+  .admin-samping a { white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; }
+  .admin-samping a.aktif { border-left: 0; border-bottom-color: var(--sikka-teal); }
+}
+
+/* --- Footer --------------------------------------------------------- */
+
+.footer-situs {
+  background: var(--sikka-gelap);
+  color: #cbd5d3;
+}
+.footer-situs h2 { letter-spacing: .06em; }
+.footer-situs a  { text-decoration: none; }
+.footer-situs a:hover { text-decoration: underline; }
+.footer-situs li { margin-bottom: .3rem; }
+
+/* --- Cetak: sembunyikan elemen interaktif -------------------------- */
+@media print {
+  .navbar, .footer-situs, .peta-panel, .peta-toggle-panel, .skip-link { display: none !important; }
+  .peta-utama { height: 300px; }
+}
