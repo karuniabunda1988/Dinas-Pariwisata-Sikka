@@ -9,6 +9,17 @@ $persenUmkm = $target['umkm'] > 0
     ? min(100, (int) round($umkm['terverifikasi'] / $target['umkm'] * 100)) : 0;
 ?>
 
+<?php if (!empty($peringatanKeamanan)): ?>
+<div class="alert alert-danger" role="alert">
+  <h2 class="h6 mb-2">Perlu perhatian keamanan</h2>
+  <ul class="mb-0 small">
+    <?php foreach ($peringatanKeamanan as $pk): ?>
+      <li><?= e($pk) ?></li>
+    <?php endforeach; ?>
+  </ul>
+</div>
+<?php endif; ?>
+
 <!-- Yang perlu dikerjakan -->
 <section class="mb-4">
   <h2 class="h6 text-uppercase text-secondary mb-2">Perlu ditindaklanjuti</h2>
