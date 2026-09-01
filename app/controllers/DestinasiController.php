@@ -152,9 +152,23 @@ final class DestinasiController extends Controller
         if ((string) $d['foto_utama'] !== '') {
             $data['image'] = base_origin() . unggahan((string) $d['foto_utama']);
         }
-        if ((string) $d['jam_operasional'] !== '') {
-            $data['openingHours'] = $d['jam_operasional'];
-        }
+        /*
+         * openingHours SENGAJA TIDAK dicantumkan.
+         *
+         * schema.org menuntut format baku seperti "Mo-Su 07:00-18:00".
+         * Kolom jam_operasional di sistem ini berisi teks bebas berbahasa
+         * Indonesia ("07.00 - 18.00 WITA") yang akan ditandai tidak valid
+         * oleh Google Rich Results Test.
+         *
+         * Mengubahnya menjadi "Mo-Su" juga bukan jalan keluar: model data
+         * belum menyimpan hari operasional, sehingga menyatakan buka setiap
+         * hari berarti mengarang informasi yang bisa membuat wisatawan datang
+         * di hari destinasi justru tutup.
+         *
+         * Jam operasional tetap ditampilkan sebagai teks di halaman untuk
+         * dibaca manusia. Bila kelak ditambahkan kolom hari operasional,
+         * barulah openingHoursSpecification dapat diisi dengan benar.
+         */
         if ((string) $d['kontak_telepon'] !== '') {
             $data['telephone'] = $d['kontak_telepon'];
         }

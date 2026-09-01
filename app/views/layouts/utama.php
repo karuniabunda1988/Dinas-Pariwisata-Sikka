@@ -82,7 +82,14 @@ $peta = App::config('peta');
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
 
-<script src="<?= e(aset('assets/vendor/bootstrap/bootstrap.bundle.min.js')) ?>" defer></script>
+<?php
+/* Skrip khusus halaman (mis. Leaflet di halaman peta) sengaja ditaruh SEBELUM
+   Bootstrap. Keduanya defer sehingga urutan eksekusi tetap terjaga, tetapi
+   pada koneksi lambat berkas yang disebut lebih dulu memenangkan perebutan
+   bandwidth - dan yang dinanti pengguna di halaman peta adalah petanya,
+   bukan menu dropdown. */
+?>
 <?= $isiSkrip ?? '' ?>
+<script src="<?= e(aset('assets/vendor/bootstrap/bootstrap.bundle.min.js')) ?>" defer fetchpriority="low"></script>
 </body>
 </html>

@@ -4,6 +4,8 @@
  * statis - pengguna bisa langsung menggeser dan mengklik pin.
  */
 $peta = App::config('peta');
+// CSS Leaflet tetap dimuat di awal (kecil, ~4 KB setelah kompresi) agar peta
+// tidak "melompat" saat skripnya menyusul. Skrip Leaflet-nya dimuat malas.
 $isiKepala = '<link rel="stylesheet" href="' . e(aset('assets/vendor/leaflet/leaflet.css')) . '">';
 ?>
 
@@ -188,19 +190,23 @@ $isiKepala = '<link rel="stylesheet" href="' . e(aset('assets/vendor/leaflet/lea
 
 <?php
 // Skrip peta ringkas beranda. Leaflet dimuat defer agar tidak memblokir render.
+// Leaflet TIDAK dimuat di sini. muat-peta-malas.js menariknya hanya ketika
+// peta ringkas hampir masuk layar - di ponsel posisinya di bawah lipatan,
+// sehingga konten utama beranda tampil lebih dulu pada koneksi 3G.
 $isiSkrip = '
-<script src="' . e(aset('assets/vendor/leaflet/leaflet.js')) . '" defer></script>
 <script>
 window.SIKKA_PETA = ' . json_skrip([
-    'pin'     => $pinAwal,
-    'lat'     => (float) Pengaturan::ambil('peta_lat_awal', (string) $peta['lat_awal']),
-    'lng'     => (float) Pengaturan::ambil('peta_lng_awal', (string) $peta['lng_awal']),
-    'zoom'    => (int) Pengaturan::ambil('peta_zoom_awal', (string) $peta['zoom_awal']),
-    'zoomMaks'=> (int) $peta['zoom_maks'],
-    'tile'    => $peta['tile_url'],
-    'atribusi'=> $peta['tile_atribusi'],
-    'urlPeta' => url('/peta'),
+    'pin'        => $pinAwal,
+    'lat'        => (float) Pengaturan::ambil('peta_lat_awal', (string) $peta['lat_awal']),
+    'lng'        => (float) Pengaturan::ambil('peta_lng_awal', (string) $peta['lng_awal']),
+    'zoom'       => (int) Pengaturan::ambil('peta_zoom_awal', (string) $peta['zoom_awal']),
+    'zoomMaks'   => (int) $peta['zoom_maks'],
+    'tile'       => $peta['tile_url'],
+    'atribusi'   => $peta['tile_atribusi'],
+    'urlPeta'    => url('/peta'),
+    'urlLeaflet' => aset('assets/vendor/leaflet/leaflet.js'),
+    'urlSkrip'   => aset('assets/js/peta-ringkas.js'),
 ]) . ';
 </script>
-<script src="' . e(aset('assets/js/peta-ringkas.js')) . '" defer></script>';
+<script src="' . e(aset('assets/js/muat-peta-malas.js')) . '" defer></script>';
 ?>

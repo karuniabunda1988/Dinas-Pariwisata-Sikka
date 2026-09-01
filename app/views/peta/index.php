@@ -4,7 +4,15 @@
  * FR-MAP-01 s/d 09 diimplementasikan di sini + public/assets/js/peta.js
  */
 $peta = App::config('peta');
+/*
+ * Peta adalah isi utama halaman ini, jadi berkasnya diberi prioritas unduh
+ * tertinggi. Pada koneksi 3G seluruh berkas berebut bandwidth yang sama;
+ * tanpa petunjuk ini Leaflet mengantre di belakang skrip lain dan peta baru
+ * bisa dipakai beberapa detik lebih lambat.
+ */
 $isiKepala = '
+<link rel="preload" as="script" fetchpriority="high" href="' . e(aset('assets/vendor/leaflet/leaflet.js')) . '">
+<link rel="preload" as="script" href="' . e(aset('assets/vendor/markercluster/leaflet.markercluster.js')) . '">
 <link rel="stylesheet" href="' . e(aset('assets/vendor/leaflet/leaflet.css')) . '">
 <link rel="stylesheet" href="' . e(aset('assets/vendor/markercluster/MarkerCluster.css')) . '">
 <link rel="stylesheet" href="' . e(aset('assets/vendor/markercluster/MarkerCluster.Default.css')) . '">';

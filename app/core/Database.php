@@ -39,7 +39,38 @@ final class Database
             );
         }
 
+        self::samakanZonaWaktu();
+
         return self::$pdo;
+    }
+
+    /**
+     * Menyamakan zona waktu sesi MySQL dengan zona waktu aplikasi (WITA).
+     *
+     * Tanpa ini, PHP dan MySQL bisa hidup di zona berbeda - lazim terjadi
+     * karena server hosting umumnya berjalan pada UTC. Akibatnya nyata dan
+     * membingungkan: admin menekan "Publish" pada sebuah artikel, PHP
+     * menyimpan published_at pukul 08.57 WITA, sementara NOW() milik MySQL
+     * masih 00.57 UTC, sehingga syarat "published_at <= NOW()" gagal dan
+     * artikel itu baru muncul di situs delapan jam kemudian tanpa penjelasan
+     * apa pun. Hal serupa dapat mengenai setiap perbandingan tanggal.
+     *
+     * Dipakai offset numerik, bukan nama zona, karena tabel zona waktu MySQL
+     * sering tidak dimuat di shared hosting.
+     */
+    private static function samakanZonaWaktu(): void
+    {
+        try {
+            $zona   = (string) (App::config('app')['timezone'] ?? 'Asia/Makassar');
+            $offset = (new DateTimeImmutable('now', new DateTimeZone($zona)))->format('P');
+
+            $stmt = self::$pdo->prepare('SET time_zone = ?');
+            $stmt->execute([$offset]);
+        } catch (Throwable $e) {
+            // Sebagian hosting melarang SET time_zone. Jangan menggagalkan
+            // permintaan hanya karena ini - cukup catat agar bisa ditelusuri.
+            error_log('[Database] Gagal menyamakan zona waktu MySQL: ' . $e->getMessage());
+        }
     }
 
     /**
